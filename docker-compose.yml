@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  app:
+    image: url_shortener:1.0
+    depends_on:
+      - postgres
+    environment:
+      SERVER_PORT: 8080
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: url_shortener
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    networks:
+      - back_tier
+
+  postgres:
+    image: postgres:16.1-alpine3.18
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: url_shortener
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - back_tier
+
+  nginx:
+    image: nginx-http:1.0
+    depends_on:
+      - app
+    ports:
+      - 80:80
+    networks:
+      - back_tier
+
+networks:
+  back_tier:
+
+volumes:
+  postgres_data:
